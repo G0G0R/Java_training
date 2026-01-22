@@ -1,6 +1,6 @@
-package model;
+package com.model;
 
-import util.Constants;
+import com.util.Constants;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -81,5 +81,9 @@ public class Task {
                 ", priority=" + priority +
                 ", dueDate=" + dueDate +
                 '}';
+    }
+
+    public boolean isOverdue(){
+        return dueDate.isAfter(LocalDate.now());
     }
 }

@@ -1,15 +1,19 @@
 package service;
 
-import model.Priority;
-import model.Status;
-import model.Task;
+import com.model.Priority;
+import com.model.Status;
+import com.model.Task;
+import com.repository.InMemoryTaskRepository;
+import com.service.TaskService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TaskServiceTest {
 
@@ -17,14 +21,14 @@ class TaskServiceTest {
 
     @BeforeEach
     void setUp() {
-        taskService = new TaskService();
+        taskService = new TaskService(new InMemoryTaskRepository());
     }
 
     @Test
     void createTask_withTitleOnly_shouldSetDefaultDescription() {
         Task task = taskService.createTask("Réviser Java");
 
-        assertNotNull(task);
+        Assertions.assertNotNull(task);
         assertEquals("Réviser Java", task.getTitle());
         assertEquals("", task.getDescription());
         assertEquals(Status.TODO, task.getStatus());
@@ -61,7 +65,7 @@ class TaskServiceTest {
 
         Task found = taskService.getTaskById(task.getId());
 
-        assertNotNull(found);
+        Assertions.assertNotNull(found);
         assertEquals(task.getId(), found.getId());
         assertEquals("Description test", found.getDescription());
     }
@@ -96,9 +100,9 @@ class TaskServiceTest {
 
         boolean deleted = taskService.deleteTask(task.getId());
 
-        assertTrue(deleted);
-        assertNull(taskService.getTaskById(task.getId()));
-        assertTrue(taskService.getAllTasks().isEmpty());
+        Assertions.assertTrue(deleted);
+        assertThrows(IllegalArgumentException.class, () -> taskService.getTaskById(task.getId()));
+        Assertions.assertTrue(taskService.getAllTasks().isEmpty());
     }
 
     @Test
@@ -114,14 +118,14 @@ class TaskServiceTest {
 
         taskService.deleteAllTasks();
 
-        assertTrue(taskService.getAllTasks().isEmpty());
+        Assertions.assertTrue(taskService.getAllTasks().isEmpty());
     }
 
     @Test
     void updateTaskDescription_shouldUpdateDescription() {
         Task task = taskService.createTask("Titre");
 
-        taskService.updateTaskDescription(task.getId(), "Nouvelle description");
+        taskService.updateDescription(task.getId(), "Nouvelle description");
 
         Task updated = taskService.getTaskById(task.getId());
         assertEquals("Nouvelle description", updated.getDescription());
@@ -131,7 +135,7 @@ class TaskServiceTest {
     void updateTaskDescription_withNull_shouldSetEmptyString() {
         Task task = taskService.createTask("Titre", "Desc", Status.TODO, Priority.MEDIUM, LocalDate.MAX);
 
-        taskService.updateTaskDescription(task.getId(), null);
+        taskService.updateDescription(task.getId(), null);
 
         assertEquals("", task.getDescription());
     }
@@ -140,7 +144,7 @@ class TaskServiceTest {
     void updateTaskStatus_shouldUpdateStatus() {
         Task task = taskService.createTask("Titre");
 
-        taskService.updateTaskStatus(task.getId(), Status.DONE);
+        taskService.updateStatus(task.getId(), Status.DONE);
 
         assertEquals(Status.DONE, task.getStatus());
     }
@@ -149,7 +153,7 @@ class TaskServiceTest {
     void updateTaskPriority_shouldUpdatePriority() {
         Task task = taskService.createTask("Titre");
 
-        taskService.updateTaskPriority(task.getId(), Priority.HIGH);
+        taskService.updatePriority(task.getId(), Priority.HIGH);
 
         assertEquals(Priority.HIGH, task.getPriority());
     }
@@ -159,7 +163,7 @@ class TaskServiceTest {
         Task task = taskService.createTask("Titre");
         LocalDate newDate = LocalDate.of(2026, 6, 1);
 
-        taskService.updateTaskDueDate(task.getId(), newDate);
+        taskService.updateDueDate(task.getId(), newDate);
 
         assertEquals(newDate, task.getDueDate());
     }
@@ -168,7 +172,7 @@ class TaskServiceTest {
     void updateTask_withUnknownId_shouldThrowException() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> taskService.updateTaskStatus(999, Status.DONE)
+                () -> taskService.updateStatus(999, Status.DONE)
         );
     }
 }

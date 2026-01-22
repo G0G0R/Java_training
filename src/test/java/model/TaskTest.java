@@ -1,10 +1,13 @@
 package model;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import com.model.Priority;
+import com.model.Status;
+import com.model.Task;
 import java.time.LocalDate;
 
-import util.Constants;
+import com.util.Constants;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class TaskTest {
 
@@ -12,12 +15,12 @@ class TaskTest {
     void testTaskCreationWithDefaults() {
         Task task = new Task("Réviser Java");
 
-        assertEquals("Réviser Java", task.getTitle());
-        assertEquals(Constants.EMPTY, task.getDescription());
-        assertEquals(Status.TODO, task.getStatus());
-        assertEquals(Priority.MEDIUM, task.getPriority());
-        assertEquals(LocalDate.MAX, task.getDueDate());
-        assertTrue(task.getId() > 0);
+        Assertions.assertEquals("Réviser Java", task.getTitle());
+        Assertions.assertEquals(Constants.EMPTY, task.getDescription());
+        Assertions.assertEquals(Status.TODO, task.getStatus());
+        Assertions.assertEquals(Priority.MEDIUM, task.getPriority());
+        Assertions.assertEquals(LocalDate.MAX, task.getDueDate());
+        Assertions.assertTrue(task.getId() > 0);
     }
 
     @Test
@@ -31,16 +34,16 @@ class TaskTest {
                 dueDate
         );
 
-        assertEquals("Faire les tests", task.getTitle());
-        assertEquals("Cette tache permet de tester la classe Java des taches", task.getDescription());
-        assertEquals(Status.IN_PROGRESS, task.getStatus());
-        assertEquals(Priority.HIGH, task.getPriority());
-        assertEquals(dueDate, task.getDueDate());
+        Assertions.assertEquals("Faire les tests", task.getTitle());
+        Assertions.assertEquals("Cette tache permet de tester la classe Java des taches", task.getDescription());
+        Assertions.assertEquals(Status.IN_PROGRESS, task.getStatus());
+        Assertions.assertEquals(Priority.HIGH, task.getPriority());
+        Assertions.assertEquals(dueDate, task.getDueDate());
     }
 
     @Test
     void testTitleCannotBeNull() {
-        assertThrows(NullPointerException.class, () -> new Task(null));
+        Assertions.assertThrows(NullPointerException.class, () -> new Task(null));
     }
 
     @Test
@@ -53,10 +56,10 @@ class TaskTest {
         LocalDate newDueDate = LocalDate.of(2026, 3, 10);
         task.setDueDate(newDueDate);
 
-        assertEquals("Nouvelle description", task.getDescription());
-        assertEquals(Status.DONE, task.getStatus());
-        assertEquals(Priority.HIGH, task.getPriority());
-        assertEquals(newDueDate, task.getDueDate());
+        Assertions.assertEquals("Nouvelle description", task.getDescription());
+        Assertions.assertEquals(Status.DONE, task.getStatus());
+        Assertions.assertEquals(Priority.HIGH, task.getPriority());
+        Assertions.assertEquals(newDueDate, task.getDueDate());
     }
 
     @Test
@@ -69,9 +72,28 @@ class TaskTest {
         task.setPriority(null);
         task.setDueDate(null);
 
-        assertEquals(Constants.EMPTY, task.getDescription());
-        assertEquals(Status.TODO, task.getStatus());
-        assertEquals(Priority.MEDIUM, task.getPriority());
-        assertEquals(LocalDate.MAX, task.getDueDate());
+        Assertions.assertEquals(Constants.EMPTY, task.getDescription());
+        Assertions.assertEquals(Status.TODO, task.getStatus());
+        Assertions.assertEquals(Priority.MEDIUM, task.getPriority());
+        Assertions.assertEquals(LocalDate.MAX, task.getDueDate());
     }
+
+    @Test
+    void testDateIsOverdue() {
+        Task task = new Task("Tache test");
+
+        task.setDueDate(LocalDate.now().plusDays(1));
+
+        Assertions.assertTrue(task.isOverdue());
+    }
+
+    @Test
+    void testDateIsNotOverdue() {
+        Task task = new Task("Tache test");
+
+        task.setDueDate(LocalDate.now().plusDays(-1));
+
+        Assertions.assertFalse(task.isOverdue());
+    }
+
 }
