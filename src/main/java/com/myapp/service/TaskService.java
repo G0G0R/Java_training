@@ -1,9 +1,9 @@
-package com.service;
+package com.myapp.service;
 
-import com.model.Priority;
-import com.model.Status;
-import com.model.Task;
-import com.repository.TaskRepository;
+import com.myapp.model.Priority;
+import com.myapp.model.Status;
+import com.myapp.model.Task;
+import com.myapp.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,7 +36,7 @@ public class TaskService {
 
     public Task getTaskById(int id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+                .orElse(null);
     }
 
     public List<Task> getAllTasks() {

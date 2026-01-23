@@ -1,6 +1,6 @@
-package com.repository;
+package com.myapp.repository;
 
-import com.model.Task;
+import com.myapp.model.Task;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;

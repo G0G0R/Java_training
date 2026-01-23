@@ -1,11 +1,11 @@
 package model;
 
-import com.model.Priority;
-import com.model.Status;
-import com.model.Task;
+import com.myapp.model.Priority;
+import com.myapp.model.Status;
+import com.myapp.model.Task;
 import java.time.LocalDate;
 
-import com.util.Constants;
+import com.myapp.util.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

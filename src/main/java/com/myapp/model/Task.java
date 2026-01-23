@@ -1,6 +1,6 @@
-package com.model;
+package com.myapp.model;
 
-import com.util.Constants;
+import com.myapp.util.Constants;
 
 import java.time.LocalDate;
 import java.util.Objects;

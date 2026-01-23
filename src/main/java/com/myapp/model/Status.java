@@ -1,4 +1,4 @@
-package com.model;
+package com.myapp.model;
 
 public enum Status {
     TODO,

@@ -1,10 +1,10 @@
 package service;
 
-import com.model.Priority;
-import com.model.Status;
-import com.model.Task;
-import com.repository.InMemoryTaskRepository;
-import com.service.TaskService;
+import com.myapp.model.Priority;
+import com.myapp.model.Status;
+import com.myapp.model.Task;
+import com.myapp.repository.InMemoryTaskRepository;
+import com.myapp.service.TaskService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

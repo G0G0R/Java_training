@@ -1,8 +1,8 @@
 package repository;
 
-import com.model.Task;
-import com.repository.InMemoryTaskRepository;
-import com.repository.TaskRepository;
+import com.myapp.model.Task;
+import com.myapp.repository.InMemoryTaskRepository;
+import com.myapp.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

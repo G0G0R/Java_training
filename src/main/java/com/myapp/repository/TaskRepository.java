@@ -1,6 +1,6 @@
-package com.repository;
+package com.myapp.repository;
 
-import com.model.Task;
+import com.myapp.model.Task;
 
 import java.util.List;
 import java.util.Optional;
