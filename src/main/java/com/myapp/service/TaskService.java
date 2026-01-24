@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -44,11 +45,7 @@ public class TaskService {
     }
 
     public boolean deleteTask(int id) {
-        if (taskRepository.findById(id).isEmpty()) {
-            return false;
-        }
-        taskRepository.deleteById(id);
-        return true;
+        return taskRepository.deleteById(id);
     }
 
     public void deleteAllTasks() {
@@ -77,5 +74,15 @@ public class TaskService {
         Task task = getTaskById(id);
         task.setDueDate(newDueDate);
         taskRepository.save(task);
+    }
+
+    public Task updateTask(int id, String description, Status status, Priority priority, LocalDate dueDate) {
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        if (optionalTask.isEmpty()) {
+            return null;
+        }
+        Task task = optionalTask.get();
+        task.update(description, status, priority, dueDate);
+        return taskRepository.save(task);
     }
 }

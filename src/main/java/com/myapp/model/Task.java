@@ -71,6 +71,13 @@ public class Task {
         this.dueDate = (dueDate != null) ? dueDate : LocalDate.MAX;
     }
 
+    public void update(String description, Status status, Priority priority, LocalDate dueDate ) {
+        if (description != null) this.description = description;
+        if (status != null) this.status = status;
+        if (priority != null) this.priority = priority;
+        if (dueDate != null) this.dueDate = dueDate;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
