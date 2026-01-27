@@ -1,5 +1,6 @@
 package service;
 
+import com.myapp.exception.TaskNotFoundException;
 import com.myapp.model.Priority;
 import com.myapp.model.Status;
 import com.myapp.model.Task;
@@ -98,10 +99,9 @@ class TaskServiceTest {
                 LocalDate.MAX
         );
 
-        boolean deleted = taskService.deleteTask(task.getId());
+        taskService.deleteTask(task.getId());
 
-        Assertions.assertTrue(deleted);
-        assertThrows(IllegalArgumentException.class, () -> taskService.getTaskById(task.getId()));
+        assertThrows(TaskNotFoundException.class, () -> taskService.getTaskById(task.getId()));
         Assertions.assertTrue(taskService.getAllTasks().isEmpty());
     }
 

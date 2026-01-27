@@ -53,29 +53,20 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Task> putTaskById(@PathVariable int id, @RequestBody UpdateTaskRequest request) {
-        Task updatedTask = taskService.updateTask(id, request.getDescription(), request.getStatus(), request.getPriority(), request.getDueDate());
-
-        if (updatedTask == null) {
-            return ResponseEntity.notFound().build();
-        }
-
+        Task updatedTask = taskService.updateTask(id, request);
         return ResponseEntity.ok(updatedTask);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Task> patchTask(@PathVariable int id, @RequestBody UpdateTaskRequest request) {
-        Task updatedTask = taskService.updateTask(id, request.getDescription(), request.getStatus(), request.getPriority(), request.getDueDate());
-
-        if (updatedTask == null) {
-            return ResponseEntity.notFound().build();
-        }
-
+        Task updatedTask = taskService.patchTask(id, request);
         return ResponseEntity.ok(updatedTask);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable int id) {
-        return taskService.deleteTask(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping

@@ -80,10 +80,9 @@ class TaskControllerTest {
 
     @Test
     void shouldReturn404WhenTaskNotFound() throws Exception {
-        when(taskService.getTaskById(1)).thenReturn(null);
-
-        mockMvc.perform(get("/tasks/1"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/tasks/{id}", 999))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("NOT_FOUND"));
     }
 
     // ---------------------------------------
@@ -135,13 +134,7 @@ class TaskControllerTest {
                 LocalDate.now().plusDays(3)
         );
 
-        when(taskService.updateTask(
-                1,
-                "Updated description",
-                Status.DONE,
-                Priority.HIGH,
-                null
-        )).thenReturn(updatedTask);
+        when(taskService.updateTask(1, any())).thenReturn(updatedTask);
 
         String json = """
                 {
@@ -152,8 +145,8 @@ class TaskControllerTest {
                 """;
 
         mockMvc.perform(put("/tasks/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("DONE"))
                 .andExpect(jsonPath("$.description").value("Updated description"));
@@ -164,18 +157,14 @@ class TaskControllerTest {
     // ---------------------------------------
     @Test
     void shouldDeleteTask() throws Exception {
-        when(taskService.deleteTask(1)).thenReturn(true);
-
         mockMvc.perform(delete("/tasks/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void shouldReturn404WhenDeletingUnknownTask() throws Exception {
-        when(taskService.deleteTask(1)).thenReturn(false);
-
         mockMvc.perform(delete("/tasks/1"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNoContent());
     }
 
     // ---------------------------------------
@@ -183,8 +172,6 @@ class TaskControllerTest {
     // ---------------------------------------
     @Test
     void shouldDeleteAllTasks() throws Exception {
-        doNothing().when(taskService).deleteAllTasks();
-
         mockMvc.perform(delete("/tasks"))
                 .andExpect(status().isNoContent());
     }

@@ -72,10 +72,10 @@ public class Task {
     }
 
     public void update(String description, Status status, Priority priority, LocalDate dueDate ) {
-        if (description != null) this.description = description;
-        if (status != null) this.status = status;
-        if (priority != null) this.priority = priority;
-        if (dueDate != null) this.dueDate = dueDate;
+        this.description = description;
+        this.status = status;
+        this.priority = priority;
+        this.dueDate = dueDate;
     }
 
     @Override
@@ -92,5 +92,23 @@ public class Task {
 
     public boolean isOverdue(){
         return dueDate.isAfter(LocalDate.now());
+    }
+
+    public void patch(Status status, Priority priority, String description, LocalDate dueDate) {
+        if (status != null) {
+            this.status = status;
+        }
+
+        if (priority != null) {
+            this.priority = priority;
+        }
+
+        if (description != null) {
+            this.description = description;
+        }
+
+        if (dueDate != null) {
+            this.dueDate = dueDate;
+        }
     }
 }

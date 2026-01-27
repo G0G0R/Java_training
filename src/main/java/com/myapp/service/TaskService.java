@@ -1,5 +1,7 @@
 package com.myapp.service;
 
+import com.myapp.dto.UpdateTaskRequest;
+import com.myapp.exception.TaskNotFoundException;
 import com.myapp.model.Priority;
 import com.myapp.model.Status;
 import com.myapp.model.Task;
@@ -38,15 +40,16 @@ public class TaskService {
 
     public Task getTaskById(int id) {
         return taskRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
-    public boolean deleteTask(int id) {
-        return taskRepository.deleteById(id);
+    public void deleteTask(int id) {
+        Task task = getTaskById(id); // exception si absent
+        taskRepository.deleteById(task.getId());
     }
 
     public void deleteAllTasks() {
@@ -77,13 +80,10 @@ public class TaskService {
         taskRepository.save(task);
     }
 
-    public Task updateTask(int id, String description, Status status, Priority priority, LocalDate dueDate) {
-        Optional<Task> optionalTask = taskRepository.findById(id);
-        if (optionalTask.isEmpty()) {
-            return null;
-        }
-        Task task = optionalTask.get();
-        task.update(description, status, priority, dueDate);
+    public Task updateTask(int id, UpdateTaskRequest request) {
+        Task task = getTaskById(id); // ← lève l’exception si absent
+        task.update(request.getDescription(), request.getStatus(), request.getPriority(), request.getDueDate());
+
         return taskRepository.save(task);
     }
 
@@ -92,5 +92,18 @@ public class TaskService {
                 .filter(task -> status == null || task.getStatus() == status)
                 .filter(task -> priority == null || task.getPriority() == priority)
                 .collect(Collectors.toList());
+    }
+
+    public Task patchTask(int id, UpdateTaskRequest request) {
+        Task task = getTaskById(id);
+
+        task.patch(
+                request.getStatus(),
+                request.getPriority(),
+                request.getDescription(),
+                request.getDueDate()
+        );
+
+        return taskRepository.save(task);
     }
 }
