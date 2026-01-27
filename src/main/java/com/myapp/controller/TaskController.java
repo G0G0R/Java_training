@@ -2,8 +2,11 @@ package com.myapp.controller;
 
 import com.myapp.dto.CreateTaskRequest;
 import com.myapp.dto.UpdateTaskRequest;
+import com.myapp.model.Priority;
+import com.myapp.model.Status;
 import com.myapp.model.Task;
 import com.myapp.service.TaskService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,14 +23,16 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task createTask(@RequestBody CreateTaskRequest request) {
-        return taskService.createTask(
+    public ResponseEntity<Task> createTask(@RequestBody CreateTaskRequest request) {
+        Task task =  taskService.createTask(
                 request.getTitle(),
                 request.getDescription(),
                 request.getStatus(),
                 request.getPriority(),
                 request.getDueDate()
         );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     @GetMapping("/{id}")
@@ -42,8 +47,8 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+    public List<Task> getAllTasks(@RequestParam(required = false) Status status, @RequestParam(required = false) Priority priority) {
+        return taskService.getTasks(status, priority);
     }
 
     @PutMapping("/{id}")

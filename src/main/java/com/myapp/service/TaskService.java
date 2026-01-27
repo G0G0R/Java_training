@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -84,5 +85,12 @@ public class TaskService {
         Task task = optionalTask.get();
         task.update(description, status, priority, dueDate);
         return taskRepository.save(task);
+    }
+
+    public List<Task> getTasks(Status status, Priority priority) {
+        return taskRepository.findAll().stream()
+                .filter(task -> status == null || task.getStatus() == status)
+                .filter(task -> priority == null || task.getPriority() == priority)
+                .collect(Collectors.toList());
     }
 }

@@ -2,9 +2,6 @@ package com.myapp.dto;
 
 import com.myapp.model.Priority;
 import com.myapp.model.Status;
-import com.myapp.model.Task;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 
