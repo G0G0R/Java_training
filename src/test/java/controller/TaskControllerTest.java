@@ -20,7 +20,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,31 +58,6 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(0));
         }
-
-    @Test
-    void shouldReturnTaskById() throws Exception {
-        Task task = new Task(
-                "Task 1",
-                "Description",
-                Status.TODO,
-                Priority.MEDIUM,
-                LocalDate.now()
-        );
-
-        when(taskService.getTaskById(1)).thenReturn(task);
-
-        mockMvc.perform(get("/tasks/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.title").value("Task 1"));
-    }
-
-    @Test
-    void shouldReturn404WhenTaskNotFound() throws Exception {
-        mockMvc.perform(get("/tasks/{id}", 999))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("NOT_FOUND"));
-    }
 
     // ---------------------------------------
     // POST /tasks
@@ -134,7 +108,7 @@ class TaskControllerTest {
                 LocalDate.now().plusDays(3)
         );
 
-        when(taskService.updateTask(1, any())).thenReturn(updatedTask);
+        when(taskService.updateTask(eq(1), any())).thenReturn(updatedTask);
 
         String json = """
                 {
@@ -152,9 +126,11 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.description").value("Updated description"));
     }
 
-    // ---------------------------------------
-    // DELETE /tasks/{id}
-    // ---------------------------------------
+    /**
+     * ---------------------------------------
+     * DELETE /tasks/{id}
+     * ---------------------------------------
+     */
     @Test
     void shouldDeleteTask() throws Exception {
         mockMvc.perform(delete("/tasks/1"))

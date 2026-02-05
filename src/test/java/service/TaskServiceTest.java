@@ -100,8 +100,8 @@ class TaskServiceTest {
         );
 
         taskService.deleteTask(task.getId());
-
-        assertThrows(TaskNotFoundException.class, () -> taskService.getTaskById(task.getId()));
+        int id = task.getId();
+        assertThrows(TaskNotFoundException.class, () -> taskService.getTaskById(id));
         Assertions.assertTrue(taskService.getAllTasks().isEmpty());
     }
 
@@ -171,7 +171,7 @@ class TaskServiceTest {
     @Test
     void updateTask_withUnknownId_shouldThrowException() {
         assertThrows(
-                IllegalArgumentException.class,
+                TaskNotFoundException.class,
                 () -> taskService.updateStatus(999, Status.DONE)
         );
     }
