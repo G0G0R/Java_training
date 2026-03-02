@@ -1,6 +1,7 @@
 package controller;
 
 import com.myapp.controller.TaskController;
+import com.myapp.exception.TaskNotFoundException;
 import com.myapp.model.Priority;
 import com.myapp.model.Status;
 import com.myapp.model.Task;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -139,8 +141,12 @@ class TaskControllerTest {
 
     @Test
     void shouldReturn404WhenDeletingUnknownTask() throws Exception {
+        doThrow(new TaskNotFoundException(1)).when(taskService).deleteTask(1);
+
         mockMvc.perform(delete("/tasks/1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("NOT_FOUND"));
     }
 
     // ---------------------------------------

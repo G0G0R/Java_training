@@ -91,7 +91,7 @@ public class Task {
     }
 
     public boolean isOverdue(){
-        return dueDate.isAfter(LocalDate.now());
+        return dueDate.isBefore(LocalDate.now());
     }
 
     public void patch(Status status, Priority priority, String description, LocalDate dueDate) {

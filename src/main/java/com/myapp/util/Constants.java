@@ -1,5 +1,10 @@
 package com.myapp.util;
 
-public class Constants {
+public final class Constants {
+
+    private Constants() {
+        // utility class
+    }
+
     public static final String EMPTY = "";
 }

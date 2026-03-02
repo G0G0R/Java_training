@@ -82,7 +82,7 @@ class TaskTest {
     void testDateIsOverdue() {
         Task task = new Task("Tache test");
 
-        task.setDueDate(LocalDate.now().plusDays(1));
+        task.setDueDate(LocalDate.now().minusDays(1));
 
         Assertions.assertTrue(task.isOverdue());
     }
@@ -91,7 +91,7 @@ class TaskTest {
     void testDateIsNotOverdue() {
         Task task = new Task("Tache test");
 
-        task.setDueDate(LocalDate.now().plusDays(-1));
+        task.setDueDate(LocalDate.now().plusDays(1));
 
         Assertions.assertFalse(task.isOverdue());
     }
