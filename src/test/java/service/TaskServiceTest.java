@@ -225,7 +225,7 @@ class TaskServiceTest {
         List<Task> filtered = taskService.getTasks(Status.DONE, null);
 
         assertEquals(1, filtered.size());
-        assertEquals(Status.DONE, filtered.get(0).getStatus());
+        assertEquals(Status.DONE, filtered.getFirst().getStatus());
     }
 
     @Test
@@ -236,7 +236,7 @@ class TaskServiceTest {
         List<Task> filtered = taskService.getTasks(null, Priority.HIGH);
 
         assertEquals(1, filtered.size());
-        assertEquals(Priority.HIGH, filtered.get(0).getPriority());
+        assertEquals(Priority.HIGH, filtered.getFirst().getPriority());
     }
 
     @Test
@@ -248,8 +248,8 @@ class TaskServiceTest {
         List<Task> filtered = taskService.getTasks(Status.DONE, Priority.HIGH);
 
         assertEquals(1, filtered.size());
-        assertEquals(Status.DONE, filtered.get(0).getStatus());
-        assertEquals(Priority.HIGH, filtered.get(0).getPriority());
+        assertEquals(Status.DONE, filtered.getFirst().getStatus());
+        assertEquals(Priority.HIGH, filtered.getFirst().getPriority());
     }
 
     @Test
