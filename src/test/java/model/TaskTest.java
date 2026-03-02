@@ -96,4 +96,64 @@ class TaskTest {
         Assertions.assertFalse(task.isOverdue());
     }
 
+
+
+    @Test
+    void testFullConstructorWithNullOptionalFieldsUsesDefaults() {
+        Task task = new Task("Titre", null, null, null, null);
+
+        Assertions.assertEquals(Constants.EMPTY, task.getDescription());
+        Assertions.assertEquals(Status.TODO, task.getStatus());
+        Assertions.assertEquals(Priority.MEDIUM, task.getPriority());
+        Assertions.assertEquals(LocalDate.MAX, task.getDueDate());
+    }
+
+    @Test
+    void testUpdateOverwritesAllFieldsEvenWithNulls() {
+        Task task = new Task("Titre", "Desc", Status.IN_PROGRESS, Priority.HIGH, LocalDate.now().plusDays(5));
+
+        task.update(null, null, null, null);
+
+        Assertions.assertNull(task.getDescription());
+        Assertions.assertNull(task.getStatus());
+        Assertions.assertNull(task.getPriority());
+        Assertions.assertNull(task.getDueDate());
+    }
+
+    @Test
+    void testPatchUpdatesOnlyProvidedFields() {
+        Task task = new Task("Titre", "Desc", Status.TODO, Priority.MEDIUM, LocalDate.of(2026, 1, 1));
+
+        task.patch(Status.DONE, null, "Nouvelle desc", null);
+
+        Assertions.assertEquals(Status.DONE, task.getStatus());
+        Assertions.assertEquals(Priority.MEDIUM, task.getPriority());
+        Assertions.assertEquals("Nouvelle desc", task.getDescription());
+        Assertions.assertEquals(LocalDate.of(2026, 1, 1), task.getDueDate());
+    }
+
+    @Test
+    void testPatchWithAllNullDoesNotChangeTask() {
+        Task task = new Task("Titre", "Desc", Status.TODO, Priority.LOW, LocalDate.of(2026, 2, 2));
+
+        task.patch(null, null, null, null);
+
+        Assertions.assertEquals("Desc", task.getDescription());
+        Assertions.assertEquals(Status.TODO, task.getStatus());
+        Assertions.assertEquals(Priority.LOW, task.getPriority());
+        Assertions.assertEquals(LocalDate.of(2026, 2, 2), task.getDueDate());
+    }
+
+    @Test
+    void testToStringContainsCoreFields() {
+        Task task = new Task("Titre", "Desc", Status.TODO, Priority.LOW, LocalDate.of(2026, 2, 2));
+
+        String value = task.toString();
+
+        Assertions.assertTrue(value.contains("title='Titre'"));
+        Assertions.assertTrue(value.contains("description='Desc'"));
+        Assertions.assertTrue(value.contains("status=TODO"));
+        Assertions.assertTrue(value.contains("priority=LOW"));
+    }
+
 }

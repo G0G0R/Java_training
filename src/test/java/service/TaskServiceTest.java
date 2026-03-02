@@ -1,5 +1,6 @@
 package service;
 
+import com.myapp.dto.UpdateTaskRequest;
 import com.myapp.exception.TaskNotFoundException;
 import com.myapp.model.Priority;
 import com.myapp.model.Status;
@@ -175,4 +176,122 @@ class TaskServiceTest {
                 () -> taskService.updateStatus(999, Status.DONE)
         );
     }
+
+    @Test
+    void updateTask_shouldReplaceAllFields() throws Exception {
+        Task task = taskService.createTask("Titre", "Ancienne desc", Status.TODO, Priority.LOW, LocalDate.of(2026, 1, 1));
+        UpdateTaskRequest request = buildRequest("Nouvelle desc", Status.DONE, Priority.HIGH, LocalDate.of(2026, 12, 1));
+
+        Task updated = taskService.updateTask(task.getId(), request);
+
+        assertEquals("Nouvelle desc", updated.getDescription());
+        assertEquals(Status.DONE, updated.getStatus());
+        assertEquals(Priority.HIGH, updated.getPriority());
+        assertEquals(LocalDate.of(2026, 12, 1), updated.getDueDate());
+    }
+
+    @Test
+    void updateTask_withUnknownId_shouldThrowTaskNotFound() throws Exception {
+        UpdateTaskRequest request = buildRequest("Desc", Status.DONE, Priority.HIGH, LocalDate.of(2026, 12, 1));
+
+        assertThrows(TaskNotFoundException.class, () -> taskService.updateTask(9999, request));
+    }
+
+    @Test
+    void patchTask_shouldOnlyUpdateNonNullFields() throws Exception {
+        Task task = taskService.createTask("Titre", "Ancienne desc", Status.TODO, Priority.LOW, LocalDate.of(2026, 1, 1));
+        UpdateTaskRequest request = buildRequest(null, Status.IN_PROGRESS, null, LocalDate.of(2026, 6, 6));
+
+        Task patched = taskService.patchTask(task.getId(), request);
+
+        assertEquals("Ancienne desc", patched.getDescription());
+        assertEquals(Status.IN_PROGRESS, patched.getStatus());
+        assertEquals(Priority.LOW, patched.getPriority());
+        assertEquals(LocalDate.of(2026, 6, 6), patched.getDueDate());
+    }
+
+    @Test
+    void patchTask_withUnknownId_shouldThrowTaskNotFound() throws Exception {
+        UpdateTaskRequest request = buildRequest("Desc", Status.DONE, Priority.HIGH, LocalDate.of(2026, 12, 1));
+
+        assertThrows(TaskNotFoundException.class, () -> taskService.patchTask(9999, request));
+    }
+
+    @Test
+    void getTasks_shouldFilterByStatusOnly() {
+        taskService.createTask("Task 1", "desc", Status.TODO, Priority.LOW, LocalDate.MAX);
+        taskService.createTask("Task 2", "desc", Status.DONE, Priority.LOW, LocalDate.MAX);
+
+        List<Task> filtered = taskService.getTasks(Status.DONE, null);
+
+        assertEquals(1, filtered.size());
+        assertEquals(Status.DONE, filtered.get(0).getStatus());
+    }
+
+    @Test
+    void getTasks_shouldFilterByPriorityOnly() {
+        taskService.createTask("Task 1", "desc", Status.TODO, Priority.LOW, LocalDate.MAX);
+        taskService.createTask("Task 2", "desc", Status.TODO, Priority.HIGH, LocalDate.MAX);
+
+        List<Task> filtered = taskService.getTasks(null, Priority.HIGH);
+
+        assertEquals(1, filtered.size());
+        assertEquals(Priority.HIGH, filtered.get(0).getPriority());
+    }
+
+    @Test
+    void getTasks_shouldFilterByStatusAndPriority() {
+        taskService.createTask("Task 1", "desc", Status.TODO, Priority.HIGH, LocalDate.MAX);
+        taskService.createTask("Task 2", "desc", Status.DONE, Priority.HIGH, LocalDate.MAX);
+        taskService.createTask("Task 3", "desc", Status.DONE, Priority.LOW, LocalDate.MAX);
+
+        List<Task> filtered = taskService.getTasks(Status.DONE, Priority.HIGH);
+
+        assertEquals(1, filtered.size());
+        assertEquals(Status.DONE, filtered.get(0).getStatus());
+        assertEquals(Priority.HIGH, filtered.get(0).getPriority());
+    }
+
+    @Test
+    void updateStatus_withNull_shouldFallbackToTodo() {
+        Task task = taskService.createTask("Titre", "Desc", Status.DONE, Priority.HIGH, LocalDate.MAX);
+
+        taskService.updateStatus(task.getId(), null);
+
+        assertEquals(Status.TODO, task.getStatus());
+    }
+
+    @Test
+    void updatePriority_withNull_shouldFallbackToMedium() {
+        Task task = taskService.createTask("Titre", "Desc", Status.DONE, Priority.HIGH, LocalDate.MAX);
+
+        taskService.updatePriority(task.getId(), null);
+
+        assertEquals(Priority.MEDIUM, task.getPriority());
+    }
+
+    @Test
+    void updateDueDate_withNull_shouldFallbackToMax() {
+        Task task = taskService.createTask("Titre", "Desc", Status.DONE, Priority.HIGH, LocalDate.of(2026, 1, 1));
+
+        taskService.updateDueDate(task.getId(), null);
+
+        assertEquals(LocalDate.MAX, task.getDueDate());
+    }
+
+    private UpdateTaskRequest buildRequest(String description, Status status, Priority priority, LocalDate dueDate) throws Exception {
+        UpdateTaskRequest request = new UpdateTaskRequest();
+        setField(request, "description", description);
+        setField(request, "status", status);
+        setField(request, "priority", priority);
+        setField(request, "dueDate", dueDate);
+        return request;
+    }
+
+    private void setField(UpdateTaskRequest request, String fieldName, Object value) throws Exception {
+        java.lang.reflect.Field field = UpdateTaskRequest.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(request, value);
+    }
+
 }
