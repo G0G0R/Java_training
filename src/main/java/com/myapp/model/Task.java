@@ -39,12 +39,12 @@ public class Task {
         this.description = (description != null) ? description : Constants.EMPTY;
         this.status = (status != null) ? status : Status.TODO;
         this.priority = (priority != null) ? priority : Priority.MEDIUM;
-        this.dueDate = (dueDate != null) ? dueDate : LocalDate.MAX;
+        this.dueDate = dueDate;
     }
 
     // Constructeur simplifié : seulement le titre
     public Task(String title) {
-        this(title, Constants.EMPTY,  Status.TODO, Priority.MEDIUM, LocalDate.MAX);
+        this(title, Constants.EMPTY,  Status.TODO, Priority.MEDIUM, null);
     }
 
     public int getId() {
@@ -84,7 +84,7 @@ public class Task {
     }
 
     public void setDueDate(LocalDate dueDate) {
-        this.dueDate = (dueDate != null) ? dueDate : LocalDate.MAX;
+        this.dueDate = dueDate;
     }
 
     public void update(String description, Status status, Priority priority, LocalDate dueDate ) {
@@ -106,8 +106,8 @@ public class Task {
                 '}';
     }
 
-    public boolean isOverdue(){
-        return dueDate.isBefore(LocalDate.now());
+    public boolean isOverdue() {
+        return dueDate != null && dueDate.isBefore(LocalDate.now());
     }
 
     public void patch(Status status, Priority priority, String description, LocalDate dueDate) {

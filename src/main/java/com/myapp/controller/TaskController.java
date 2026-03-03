@@ -2,8 +2,6 @@ package com.myapp.controller;
 
 import com.myapp.dto.CreateTaskRequest;
 import com.myapp.dto.UpdateTaskRequest;
-import com.myapp.model.Priority;
-import com.myapp.model.Status;
 import com.myapp.model.Task;
 import com.myapp.service.TaskService;
 import org.springframework.http.HttpStatus;
@@ -41,8 +39,8 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<Task> getAllTasks(@RequestParam(required = false) Status status, @RequestParam(required = false) Priority priority) {
-        return taskService.getTasks(status, priority);
+    public List<Task> getAllTasks() {
+        return taskService.getAllTasks();
     }
 
     @PutMapping("/{id}")
@@ -53,7 +51,7 @@ public class TaskController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Task> patchTask(@PathVariable int id, @RequestBody UpdateTaskRequest request) {
-        Task updatedTask = taskService.patchTask(id, request);
+        Task updatedTask = taskService.updateTask(id, request);
         return ResponseEntity.ok(updatedTask);
     }
 
