@@ -1,19 +1,7 @@
 package com.myapp.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import com.myapp.model.Task;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface TaskRepository {
-
-    Task save(Task task);
-
-    Optional<Task> findById(int id);
-
-    List<Task> findAll();
-
-    boolean deleteById(int id);
-
-    void deleteAll();
+public interface TaskRepository extends JpaRepository<Task, Integer> {
 }

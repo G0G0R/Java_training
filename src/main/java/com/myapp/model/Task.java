@@ -1,22 +1,38 @@
 package com.myapp.model;
 
 import com.myapp.util.Constants;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Entity
+@Table(name = "tasks")
 public class Task {
-    private static int counter = 1;
-    private final int id;
-    private final String title;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(nullable = false)
+    private String title;
+
     private String description;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Enumerated(EnumType.STRING)
     private Priority priority;
+
     private LocalDate dueDate;
+
+    public Task() {
+        // Constructeur vide obligatoire pour JPA
+    }
 
     // Constructeur complet
     public Task(String title, String description,  Status status, Priority priority, LocalDate dueDate) {
-        this.id = counter++;
         // Validation du titre obligatoire
         this.title = Objects.requireNonNull(title, "Le titre est obligatoire");
         // Valeurs par défaut si null
