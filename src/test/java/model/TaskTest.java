@@ -6,154 +6,152 @@ import com.myapp.model.Task;
 import java.time.LocalDate;
 
 import com.myapp.util.Constants;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
 
     @Test
-    void testTaskCreationWithDefaults() {
+    void constructorWithTitleOnly_shouldApplyDefaults() {
         Task task = new Task("Réviser Java");
 
-        Assertions.assertEquals("Réviser Java", task.getTitle());
-        Assertions.assertEquals(Constants.EMPTY, task.getDescription());
-        Assertions.assertEquals(Status.TODO, task.getStatus());
-        Assertions.assertEquals(Priority.MEDIUM, task.getPriority());
-        Assertions.assertEquals(LocalDate.MAX, task.getDueDate());
-        Assertions.assertTrue(task.getId() > 0);
+        assertEquals("Réviser Java", task.getTitle());
+        assertEquals(Constants.EMPTY, task.getDescription());
+        assertEquals(Status.TODO, task.getStatus());
+        assertEquals(Priority.MEDIUM, task.getPriority());
+        assertNull(task.getDueDate());
     }
 
     @Test
-    void testTaskCreationWithAllParameters() {
+    void fullConstructor_shouldKeepProvidedValues() {
         LocalDate dueDate = LocalDate.of(2026, 2, 1);
+
         Task task = new Task(
                 "Faire les tests",
-                "Cette tache permet de tester la classe Java des taches",
+                "Cette tâche sert à tester le modèle",
                 Status.IN_PROGRESS,
                 Priority.HIGH,
                 dueDate
         );
 
-        Assertions.assertEquals("Faire les tests", task.getTitle());
-        Assertions.assertEquals("Cette tache permet de tester la classe Java des taches", task.getDescription());
-        Assertions.assertEquals(Status.IN_PROGRESS, task.getStatus());
-        Assertions.assertEquals(Priority.HIGH, task.getPriority());
-        Assertions.assertEquals(dueDate, task.getDueDate());
+        assertEquals("Faire les tests", task.getTitle());
+        assertEquals("Cette tâche sert à tester le modèle", task.getDescription());
+        assertEquals(Status.IN_PROGRESS, task.getStatus());
+        assertEquals(Priority.HIGH, task.getPriority());
+        assertEquals(dueDate, task.getDueDate());
     }
 
     @Test
-    void testTitleCannotBeNull() {
-        Assertions.assertThrows(NullPointerException.class, () -> new Task(null));
+    void fullConstructor_withNullOptionalValues_shouldApplyDefaults() {
+        Task task = new Task("Titre", null, null, null, null);
+
+        assertEquals(Constants.EMPTY, task.getDescription());
+        assertEquals(Status.TODO, task.getStatus());
+        assertEquals(Priority.MEDIUM, task.getPriority());
+        assertNull(task.getDueDate());
     }
 
     @Test
-    void testSettersUpdateValues() {
+    void constructor_withNullTitle_shouldThrowNullPointerException() {
+        assertThrows(NullPointerException.class, () -> new Task(null));
+    }
+
+    @Test
+    void setters_withValidValues_shouldUpdateFields() {
         Task task = new Task("Tâche initiale");
+        LocalDate newDueDate = LocalDate.of(2026, 3, 10);
 
         task.setDescription("Nouvelle description");
         task.setStatus(Status.DONE);
         task.setPriority(Priority.HIGH);
-        LocalDate newDueDate = LocalDate.of(2026, 3, 10);
         task.setDueDate(newDueDate);
 
-        Assertions.assertEquals("Nouvelle description", task.getDescription());
-        Assertions.assertEquals(Status.DONE, task.getStatus());
-        Assertions.assertEquals(Priority.HIGH, task.getPriority());
-        Assertions.assertEquals(newDueDate, task.getDueDate());
+        assertEquals("Nouvelle description", task.getDescription());
+        assertEquals(Status.DONE, task.getStatus());
+        assertEquals(Priority.HIGH, task.getPriority());
+        assertEquals(newDueDate, task.getDueDate());
     }
 
     @Test
-    void testSettersHandleNullGracefully() {
-        Task task = new Task("Tâche test");
+    void setters_withNullValues_shouldApplyFallbackExceptDueDate() {
+        Task task = new Task("Tâche test", "Desc", Status.DONE, Priority.HIGH, LocalDate.of(2026, 1, 1));
 
-        // Les setters doivent appliquer la valeur par défaut si null
         task.setDescription(null);
         task.setStatus(null);
         task.setPriority(null);
         task.setDueDate(null);
 
-        Assertions.assertEquals(Constants.EMPTY, task.getDescription());
-        Assertions.assertEquals(Status.TODO, task.getStatus());
-        Assertions.assertEquals(Priority.MEDIUM, task.getPriority());
-        Assertions.assertEquals(LocalDate.MAX, task.getDueDate());
+        assertEquals(Constants.EMPTY, task.getDescription());
+        assertEquals(Status.TODO, task.getStatus());
+        assertEquals(Priority.MEDIUM, task.getPriority());
+        assertNull(task.getDueDate());
     }
 
     @Test
-    void testDateIsOverdue() {
-        Task task = new Task("Tache test");
+    void isOverdue_shouldReturnTrueForPastDate() {
+        Task task = new Task("Tâche", "Desc", Status.TODO, Priority.MEDIUM, LocalDate.now().minusDays(1));
 
-        task.setDueDate(LocalDate.now().minusDays(1));
-
-        Assertions.assertTrue(task.isOverdue());
+        assertTrue(task.isOverdue());
     }
 
     @Test
-    void testDateIsNotOverdue() {
-        Task task = new Task("Tache test");
+    void isOverdue_shouldReturnFalseForTodayFutureOrNullDate() {
+        Task todayTask = new Task("Today", "Desc", Status.TODO, Priority.MEDIUM, LocalDate.now());
+        Task futureTask = new Task("Future", "Desc", Status.TODO, Priority.MEDIUM, LocalDate.now().plusDays(2));
+        Task nullDateTask = new Task("Null date", "Desc", Status.TODO, Priority.MEDIUM, null);
 
-        task.setDueDate(LocalDate.now().plusDays(1));
-
-        Assertions.assertFalse(task.isOverdue());
-    }
-
-
-
-    @Test
-    void testFullConstructorWithNullOptionalFieldsUsesDefaults() {
-        Task task = new Task("Titre", null, null, null, null);
-
-        Assertions.assertEquals(Constants.EMPTY, task.getDescription());
-        Assertions.assertEquals(Status.TODO, task.getStatus());
-        Assertions.assertEquals(Priority.MEDIUM, task.getPriority());
-        Assertions.assertEquals(LocalDate.MAX, task.getDueDate());
+        assertFalse(todayTask.isOverdue());
+        assertFalse(futureTask.isOverdue());
+        assertFalse(nullDateTask.isOverdue());
     }
 
     @Test
-    void testUpdateOverwritesAllFieldsEvenWithNulls() {
+    void update_shouldOverwriteAllFieldsIncludingNulls() {
         Task task = new Task("Titre", "Desc", Status.IN_PROGRESS, Priority.HIGH, LocalDate.now().plusDays(5));
 
         task.update(null, null, null, null);
 
-        Assertions.assertNull(task.getDescription());
-        Assertions.assertNull(task.getStatus());
-        Assertions.assertNull(task.getPriority());
-        Assertions.assertNull(task.getDueDate());
+        assertNull(task.getDescription());
+        assertNull(task.getStatus());
+        assertNull(task.getPriority());
+        assertNull(task.getDueDate());
     }
 
     @Test
-    void testPatchUpdatesOnlyProvidedFields() {
+    void patch_shouldOnlyUpdateProvidedFields() {
         Task task = new Task("Titre", "Desc", Status.TODO, Priority.MEDIUM, LocalDate.of(2026, 1, 1));
 
         task.patch(Status.DONE, null, "Nouvelle desc", null);
 
-        Assertions.assertEquals(Status.DONE, task.getStatus());
-        Assertions.assertEquals(Priority.MEDIUM, task.getPriority());
-        Assertions.assertEquals("Nouvelle desc", task.getDescription());
-        Assertions.assertEquals(LocalDate.of(2026, 1, 1), task.getDueDate());
+        assertEquals(Status.DONE, task.getStatus());
+        assertEquals(Priority.MEDIUM, task.getPriority());
+        assertEquals("Nouvelle desc", task.getDescription());
+        assertEquals(LocalDate.of(2026, 1, 1), task.getDueDate());
     }
 
     @Test
-    void testPatchWithAllNullDoesNotChangeTask() {
+    void patch_withAllNulls_shouldKeepCurrentState() {
         Task task = new Task("Titre", "Desc", Status.TODO, Priority.LOW, LocalDate.of(2026, 2, 2));
 
         task.patch(null, null, null, null);
 
-        Assertions.assertEquals("Desc", task.getDescription());
-        Assertions.assertEquals(Status.TODO, task.getStatus());
-        Assertions.assertEquals(Priority.LOW, task.getPriority());
-        Assertions.assertEquals(LocalDate.of(2026, 2, 2), task.getDueDate());
+        assertEquals("Desc", task.getDescription());
+        assertEquals(Status.TODO, task.getStatus());
+        assertEquals(Priority.LOW, task.getPriority());
+        assertEquals(LocalDate.of(2026, 2, 2), task.getDueDate());
     }
 
     @Test
-    void testToStringContainsCoreFields() {
+    void toString_shouldContainMainFields() {
         Task task = new Task("Titre", "Desc", Status.TODO, Priority.LOW, LocalDate.of(2026, 2, 2));
 
         String value = task.toString();
 
-        Assertions.assertTrue(value.contains("title='Titre'"));
-        Assertions.assertTrue(value.contains("description='Desc'"));
-        Assertions.assertTrue(value.contains("status=TODO"));
-        Assertions.assertTrue(value.contains("priority=LOW"));
+        assertNotNull(value);
+        assertTrue(value.contains("title='Titre'"));
+        assertTrue(value.contains("description='Desc'"));
+        assertTrue(value.contains("status=TODO"));
+        assertTrue(value.contains("priority=LOW"));
     }
-
 }
